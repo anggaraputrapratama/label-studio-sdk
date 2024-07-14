@@ -46,7 +46,7 @@ def get_export_args(parser):
         help="Output format: " + ", ".join(f.name for f in Format),
         type=Format.from_string,
         choices=list(Format),
-        default=Format.JSON,
+        default=Format.YOLO,
     )
     parser.add_argument(
         "--csv-separator",
@@ -108,56 +108,8 @@ def get_all_args():
 def export(args):
     c = Converter(args.config, project_dir=args.project_dir)
 
-    if args.format == Format.JSON:
-        c.convert_to_json(args.input, args.output)
-    elif args.format == Format.CSV:
-        header = not args.csv_no_header
-        sep = args.csv_separator
-        c.convert_to_csv(
-            args.input,
-            args.output,
-            sep=sep,
-            header=header,
-            is_dir=not args.heartex_format,
-        )
-    elif args.format == Format.CSV_OLD:
-        header = not args.csv_no_header
-        sep = args.csv_separator
-        ExportToCSV(args.input).to_file(
-            args.output, sep=sep, header=header, index=False
-        )
-    elif args.format == Format.TSV:
-        header = not args.csv_no_header
-        sep = "\t"
-        c.convert_to_csv(
-            args.input,
-            args.output,
-            sep=sep,
-            header=header,
-            is_dir=not args.heartex_format,
-        )
-    elif args.format == Format.CONLL2003:
-        c.convert_to_conll2003(args.input, args.output, is_dir=not args.heartex_format)
-    elif args.format == Format.COCO:
-        c.convert_to_coco(
-            args.input,
-            args.output,
-            output_image_dir=args.image_dir,
-            is_dir=not args.heartex_format,
-        )
-    elif args.format == Format.VOC:
-        c.convert_to_voc(
-            args.input,
-            args.output,
-            output_image_dir=args.image_dir,
-            is_dir=not args.heartex_format,
-        )
-    elif args.format == Format.YOLO:
+    if args.format == Format.YOLO:
         c.convert_to_yolo(args.input, args.output, is_dir=not args.heartex_format)
-    elif args.format == Format.YOLO_OBB:
-        c.convert_to_yolo(
-            args.input, args.output, is_dir=not args.heartex_format, is_obb=True
-        )
     else:
         raise FormatNotSupportedError()
 
@@ -172,17 +124,6 @@ def imports(args):
             out_type=args.out_type,
             image_root_url=args.image_root_url,
             image_ext=args.image_ext,
-        )
-
-    elif args.import_format == "coco":
-        import_coco.convert_coco_to_ls(
-            input_file=args.input,
-            out_file=args.output,
-            to_name=args.to_name,
-            from_name=args.from_name,
-            out_type=args.out_type,
-            image_root_url=args.image_root_url,
-            point_width=args.point_width,
         )
     else:
         raise FormatNotSupportedError()
